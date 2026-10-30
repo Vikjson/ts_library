@@ -6,15 +6,84 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
+import org.junit.jupiter.params.provider.EmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 public class UsernameTest {
-    @Test
-    void correctUsername() {
-        assertThat(Username.validate("bosse")).isTrue();
+    @ParameterizedTest
+    @ValueSource(strings = { "jossan34", "anna", "B0ss3", "user_name", "user.name", "user-name", "l@ban", "1234" })
+    void shouldAcceptNamesFourOrLonger(String username) {
+        assertThat(Username.validate(username)).isTrue();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "1", "fi", "57t", "ada", "999" })
+    void shoulrRejectNamesShorterThanFour(String username) {
+        assertThat(Username.validate(username)).isFalse();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "abcdefghijklmnopqrstuvwxyz",
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+            "0123456789",
+            "@._-",
+            "abc123XYZ@._-",
+            "aaaa",
+            "0000",
+            "@@@@",
+            "....",
+            "____",
+            "----"
+    })
+    void shouldAcceptAllValidCharacters(String username) {
+        assertThat(Username.validate(username)).isTrue();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "anna35!",
+            "user#name",
+            "user$name",
+            "user%name",
+            "user&name",
+            "user*name",
+            "user+name",
+            "user=name",
+            "user/name",
+            "user\\name",
+            "user:name",
+            "user;name",
+            "user?name",
+            "user,name",
+            "user(name)",
+            "user[name]",
+            "user{name}",
+            "user name",
+            " user",
+            "user ",
+            "user\tname",
+            "user\nname",
+            "jösse",
+            "åsa123",
+            "äntligen",
+            "café",
+            "你好世界",
+            "user😊"
+    })
+    void shouldRejectInvalidCharacters(String username) {
+        assertThat(Username.validate(username)).isFalse();
     }
 
     @Test
-    void incorrectUsername() {
-        assertThat(Username.validate("name with space")).isFalse();
+    void shouldAcceptLongUsername() {
+        String username = "a".repeat(5000);
+        assertThat(Username.validate(username)).isTrue();
+    }
+
+    @ParameterizedTest
+    @EmptySource
+    void shouldRejectEmptyUsername(String username) {
+        assertThat(Username.validate(username)).isFalse();
     }
 }
