@@ -76,9 +76,18 @@ public class UsernameTest {
     }
 
     @Test
-    void shouldAcceptLongUsername() {
-        String username = "a".repeat(5000);
+    void shouldAcceptLongUsernameUpToSeventy() {
+        String username = "a".repeat(70);
+        String username2 = "b".repeat(69);
         assertThat(Username.validate(username)).isTrue();
+        assertThat(Username.validate( username2)).isTrue();
+    }
+
+    
+    @Test
+    void shouldRejectLongUsernameOverSeventy() {
+        String username = "a".repeat(71);
+        assertThat(Username.validate(username)).isFalse();
     }
 
     @ParameterizedTest
