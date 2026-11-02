@@ -1,8 +1,4 @@
--- yrgoP4ssword
-INSERT INTO user VALUES (DEFAULT, 'test2', '$argon2i$v=19$m=16,t=2,p=1$MTIzNDU2Nzg5MDEyMzQ1NjA$LmFqTZeUWwqsnbZCS2E8XQ');
--- user test2 is admin and user
-INSERT INTO user_role VALUES (2, 1);
-INSERT INTO user_role VALUES (2, 2);
+
 
 INSERT INTO dewey_decimal_system
 VALUES
@@ -28,5 +24,5 @@ VALUES
 
 INSERT INTO book_loan
 VALUES
-    (2, 2, '2021-05-12'),
-    (4, 2, '2021-05-02');
+    (2, 1, '2021-05-12'),
+    (4, 1, '2021-05-02');
