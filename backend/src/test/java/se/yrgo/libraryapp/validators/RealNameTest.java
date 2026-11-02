@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import org.junit.jupiter.params.provider.EmptySource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 public class RealNameTest {
@@ -22,18 +23,7 @@ public class RealNameTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {
-            "balderdash",
-            "blimey",
-            "bullspit",
-            "damn",
-            "darn",
-            "drat",
-            "frack",
-            "frick",
-            "heck",
-            "shiet"
-    })
+    @CsvFileSource(resources = "/bad_words.txt")
     void shouldRejectNamesWithBadWords(String name) {
         assertThat(RealName.validate(name)).isFalse();
     }
