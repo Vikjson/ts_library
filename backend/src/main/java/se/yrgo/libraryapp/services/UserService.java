@@ -5,13 +5,16 @@ import javax.inject.Inject;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import se.yrgo.libraryapp.dao.UserDao;
 import se.yrgo.libraryapp.entities.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class UserService {
     private UserDao userDao;
+    private PasswordEncoder encoder;
 
     @Inject
-    UserService(UserDao userDao) {
+    UserService(UserDao userDao, PasswordEncoder encoder) {
         this.userDao = userDao;
+        this.encoder = encoder;
     }
 
     public Optional<UserId> validate(String username, String password) {
@@ -28,5 +31,5 @@ public class UserService {
         }
 
         return Optional.of(loginInfo.getUserId());
-    }        
+    }
 }
