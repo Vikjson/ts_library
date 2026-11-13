@@ -47,18 +47,18 @@ public class UserDaoIntegrationTest {
     void getNonExistingUser() {
         UserDao userDao = new UserDao(ds);
 
-        Optional<User> result = userDao.get("99999");
+        Optional<User> searchResult = userDao.get("99999");
 
-        assertThat(result).isEmpty();
+        assertThat(searchResult).isEmpty();
     }
 
     @Test
-    void shouldReturnTrueIfUsernameIsAvailable() {
+    void isNameAvailableshouldReturnTrueIfUsernameIsAvailable() {
         UserDao userDao = new UserDao(ds);
 
-        boolean result = userDao.isNameAvailable("availableUserName123");
+        boolean isAvailable = userDao.isNameAvailable("availableUserName123");
 
-        assertThat(result).isTrue();
+        assertThat(isAvailable).isTrue();
     }
 
     @Test
@@ -66,23 +66,24 @@ public class UserDaoIntegrationTest {
         UserDao userDao = new UserDao(ds);
 
         String username = "newTestUser";
-        String realname = "Bosse Test";
-        String passwordHash = "hashedPassword123";
+        String passwordHash = "hashedPassword555";
 
-        boolean result = userDao.register(username, realname, passwordHash);
-        assertThat(result).isTrue();
+        boolean registered = userDao.register(username, "Bosse Snedsladd", passwordHash);
+        assertThat(registered).isTrue();
 
-        Optional<LoginInfo> loginInfo = userDao.getLoginInfo(username);
-        assertThat(loginInfo).isPresent();
-        assertThat(loginInfo.get().getPasswordHash()).isEqualTo(passwordHash);
+        LoginInfo loginInfo = userDao.getLoginInfo(username).orElseThrow();
+        assertThat(loginInfo.getPasswordHash()).isEqualTo(passwordHash);
 
-        int userId = loginInfo.get().getUserId().getId();
+        User user = userDao.get(
+                loginInfo.getUserId().toString()).orElseThrow();
+        assertThat(user.getName()).isEqualTo(username);
+        assertThat(user.getRealname()).isEqualTo("Bosse Snedsladd");
 
         try (Connection conn = ds.getConnection();
                 PreparedStatement ps = conn.prepareStatement(
                         "SELECT role_id FROM user_role WHERE user_id = ?")) {
 
-            ps.setInt(1, userId);
+            ps.setInt(1, loginInfo.getUserId().getId());
 
             try (ResultSet rs = ps.executeQuery()) {
                 assertThat(rs.next()).isTrue();

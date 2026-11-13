@@ -2,7 +2,6 @@ package se.yrgo.libraryapp.services;
 
 import java.util.Optional;
 import javax.inject.Inject;
-import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import se.yrgo.libraryapp.dao.UserDao;
 import se.yrgo.libraryapp.entities.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,8 +23,7 @@ public class UserService {
         }
 
         LoginInfo loginInfo = maybeLoginInfo.get();
-
-        Argon2PasswordEncoder encoder = new Argon2PasswordEncoder();
+       
         if (!encoder.matches(password, loginInfo.getPasswordHash())) {
             return Optional.empty();
         }
