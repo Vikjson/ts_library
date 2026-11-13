@@ -8,6 +8,8 @@ import org.mockito.quality.Strictness;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import se.yrgo.libraryapp.dao.UserDao;
@@ -61,4 +63,89 @@ public class UserServiceTest {
         assertThat(hasRegisteredUser).isTrue();
     }
 
+    @Test
+    void shouldReturnFalseWhenFailingRegisterUser() {
+
+        String username = "testingUser";
+        String realname = "Bosse";
+        String password = "bredsladd123";
+        String passwordHash = "hashedPassword123";
+
+        when(encoder.encode(password)).thenReturn(passwordHash);
+
+        when(userDao.register(username, realname, passwordHash))
+                .thenReturn(false);
+
+        UserService userService = new UserService(userDao, encoder);
+
+        boolean hasRegisteredUser = userService.register(username, realname, password);
+
+        assertThat(hasRegisteredUser).isFalse();
+    }
+
+    @Test
+    void shouldHashPasswordThenRegister() {
+        String username = "testingUser";
+        String realname = "Bosse";
+        String password = "bredsladd123";
+        String passwordHash = "hashedPassword123";
+
+        when(encoder.encode(password)).thenReturn(passwordHash);
+
+        UserService userService = new UserService(userDao, encoder);
+
+        userService.register(username, realname, password);
+
+        verify(encoder).encode(password);
+        verify(userDao).register(username, realname, passwordHash);
+    }
+
+    @Test
+    void shouldRejectShortUsername() {
+        UserService userService = new UserService(userDao, encoder);
+
+        boolean result = userService.isNameAvailable("bo");
+
+        assertThat(result).isFalse();
+
+        verifyNoInteractions(userDao);
+    }
+
+    @Test
+    void shouldAcceptAvailableUsername() {
+        String username = "vixvixington";
+
+        when(userDao.isNameAvailable(username)).thenReturn(true);
+
+        UserService userService = new UserService(userDao, encoder);
+
+        boolean result = userService.isNameAvailable(username);
+
+        assertThat(result).isTrue();
+        verify(userDao).isNameAvailable(username);
+    }
+
+    @Test
+    void shouldRejectWhenUsernameAlreadyExists() {
+        String username = "bosse";
+
+        when(userDao.isNameAvailable(username)).thenReturn(false);
+
+        UserService userService = new UserService(userDao, encoder);
+
+        boolean result = userService.isNameAvailable(username);
+
+        assertThat(result).isFalse();
+        verify(userDao).isNameAvailable(username);
+    }
+
+    @Test
+    void shouldRejectUsernameWhenNull() {
+        UserService userService = new UserService(userDao, encoder);
+
+        boolean result = userService.isNameAvailable(null);
+
+        assertThat(result).isFalse();
+        verifyNoInteractions(userDao);
+    }
 }

@@ -58,10 +58,8 @@ public class UserDao {
         return Optional.empty();
     }
 
-    public boolean register(String name, String realname, String password) {
-        Argon2PasswordEncoder encoder = new Argon2PasswordEncoder();
-        String passwordHash = encoder.encode(password);
-
+    public boolean register(String name, String realname, String passwordHash) {
+       
         // handle names like Ian O'Toole
         realname = realname.replace("'", "\\'");
 
@@ -75,12 +73,9 @@ public class UserDao {
         }
     }
 
-    public boolean isNameAvailable(String name) {
-        if (name == null || name.trim().length() < 3) {
-            return false;
-        }
 
-        String query = "SELECT id FROM user WHERE user = ?";
+    public boolean isNameAvailable(String name) {
+                String query = "SELECT id FROM user WHERE user = ?";
         try (Connection conn = ds.getConnection();
                 PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setString(1, name);
