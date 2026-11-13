@@ -19,6 +19,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class UserServiceTest {
     @Mock
     private UserDao userDao;
+    @Mock
+    private PasswordEncoder encoder;
 
     @Test
     @SuppressWarnings("deprecation")
@@ -39,4 +41,24 @@ public class UserServiceTest {
         assertThat(userService.validate(username,
                 password)).isEqualTo(Optional.of(id));
     }
+
+    @Test
+    void shouldRegisterUserSuccessfully() {
+        String username = "testingUser";
+        String realname = "Bosse";
+        String password = "bredsladd123";
+        String passwordHash = "hashedPassword123";
+
+        when(encoder.encode(password)).thenReturn(passwordHash);
+
+        when(userDao.register(username, realname, passwordHash))
+                .thenReturn(true);
+
+        UserService userService = new UserService(userDao, encoder);
+
+        boolean hasRegisteredUser = userService.register(username, realname, password);
+
+        assertThat(hasRegisteredUser).isTrue();
+    }
+
 }
